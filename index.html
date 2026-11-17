@@ -1,1 +1,265 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamerHub - Your Gaming Universe</title>
+<style>
+:root{--bg:#090914;--panel:#121225;--panel2:#191932;--purple:#9b5cff;--blue:#397bff;--cyan:#21d4fd;--text:#f5f3ff;--muted:#9996b5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;background:#101020;border-right:1px solid #242342;padding:25px 16px;position:fixed;inset:0 auto 0 0}
+.logo{font-size:25px;font-weight:900;margin:8px 10px 35px;background:linear-gradient(90deg,var(--purple),var(--cyan));color:transparent;background-clip:text}
+.nav{display:flex;flex-direction:column;gap:9px}
+.nav button{background:transparent;color:var(--muted);border:0;padding:14px;border-radius:12px;text-align:left}
+.nav button:hover,.nav button.active{background:linear-gradient(100deg,#5128a8,#174c9b);color:white}
+.sidebar small{display:block;color:var(--muted);margin:35px 12px 12px}
+.main{margin-left:230px;width:calc(100% - 230px);padding:30px;max-width:1500px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.topbar h2{margin:0}
+.status{color:#6ce6ae;font-size:13px}
+.page{display:none}.page.active{display:block}
+.hero{padding:35px;border-radius:20px;background:linear-gradient(115deg,#46208b,#174a94,#087e9b);margin-bottom:25px}
+.hero h1{font-size:clamp(27px,4vw,42px);margin:0 0 10px}
+.hero p{color:#e0e6ff}
+.card{background:var(--panel);border:1px solid #292744;border-radius:16px;padding:20px;margin-bottom:17px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+h3{margin-top:0}
+.muted{color:var(--muted)}
+.postbox textarea{width:100%;background:var(--panel2);border:1px solid #353052;color:white;padding:13px;border-radius:10px;resize:vertical;min-height:75px}
+.primary{border:0;border-radius:10px;padding:11px 18px;color:white;background:linear-gradient(100deg,var(--purple),var(--blue));font-weight:bold;margin-top:10px}
+.primary:hover{filter:brightness(1.2)}
+.person,.community{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid #292744}
+.avatar{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--cyan));font-weight:bold;flex-shrink:0}
+.online{color:#6ce6ae;font-size:12px}
+input{background:var(--panel2);border:1px solid #353052;color:white;border-radius:9px;padding:12px;width:100%;margin:10px 0}
+.post-actions{display:flex;gap:10px;margin-top:15px}
+.post-actions button{background:#24213f;color:#c9c3ed;border:0;border-radius:9px;padding:9px 13px}
+.message-layout{display:grid;grid-template-columns:230px 1fr;gap:15px;min-height:420px}
+.chat{display:flex;flex-direction:column;min-height:420px}
+.chat-messages{flex:1;max-height:320px;overflow:auto}
+.bubble{background:#252344;padding:11px 14px;border-radius:13px;margin:9px 0;max-width:80%;width:fit-content}
+.bubble.mine{background:#5633a3;margin-left:auto}
+.chat-send{display:flex;gap:8px}
+.chat-send input{margin:0}
+.profile-head{display:flex;align-items:center;gap:20px;padding:30px;background:linear-gradient(110deg,#37206c,#143e72);border-radius:18px;margin-bottom:20px}
+.big-avatar{width:90px;height:90px;font-size:30px}
+.empty{padding:25px;text-align:center;color:var(--muted)}
+footer{color:#77738e;text-align:center;padding:30px;font-size:12px}
+.mobile-nav{display:none}
+@media(max-width:800px){
+.sidebar{display:none}.main{margin:0;width:100%;padding:18px 15px 90px}
+.grid{grid-template-columns:1fr}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#121225;border-top:1px solid #292744;justify-content:space-around;padding:9px;z-index:5}
+.mobile-nav button{background:none;border:0;color:#c8c3e8;font-size:11px;padding:8px}
+.message-layout{grid-template-columns:1fr}.message-layout .people-list{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo">✦ GamerHub</div>
+<div class="nav">
+<button class="active" data-page="home">⌂ &nbsp; Home</button>
+<button data-page="friends">♧ &nbsp; Friends</button>
+<button data-page="messages">✉ &nbsp; Messages</button>
+<button data-page="communities">◈ &nbsp; Communities</button>
+<button data-page="profile">◎ &nbsp; My Profile</button>
+</div>
+<small>YOUR GAMING UNIVERSE</small>
+<p class="muted" style="padding:0 12px">Find your people. Play together.</p>
+</aside>
+<main class="main">
+<header class="topbar">
+<h2 id="pageTitle">Home</h2>
+<span class="status">● Online</span>
+</header>
+
+<section class="page active" id="home">
+<div class="hero">
+<h1>Welcome to GamerHub!</h1>
+<p>Your gaming world starts here. Meet players, share moments, and find your next squad.</p>
+<button class="primary" onclick="showPage('communities')">Explore communities →</button>
+</div>
+<div class="grid">
+<div>
+<div class="card postbox">
+<h3>Share something with gamers</h3>
+<textarea id="postText" placeholder="What's happening in your gaming world?"></textarea>
+<button class="primary" onclick="addPost()">Publish Post</button>
+</div>
+<h3>Community Feed</h3>
+<div id="feed">
+<div class="card"><b>🎮 GamerHub</b><p>Welcome to GamerHub! Introduce yourself and meet the community.</p><span class="muted">Official announcement</span></div>
+</div>
+</div>
+<div>
+<div class="card"><h3>🔥 Trending Games</h3><p>Call of Duty</p><p>Fortnite</p><p>Minecraft</p><p>Roblox</p><p>Grand Theft Auto</p></div>
+<div class="card"><h3>🌟 Your Hub</h3><p>Friends: <b id="friendCount">4</b></p><p>Communities: <b id="communityCount">2</b></p><p>Posts: <b id="postCount">0</b></p></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="friends">
+<h3>Your Friends</h3>
+<input id="friendSearch" placeholder="Search friends..." oninput="searchFriends()">
+<div class="card" id="friendList"></div>
+</section>
+
+<section class="page" id="messages">
+<h3>Private Messages</h3>
+<div class="card message-layout">
+<div class="people-list" id="chatPeople"></div>
+<div class="chat">
+<div><b id="chatName">Choose a friend</b><p class="muted">Your conversations</p></div>
+<div class="chat-messages" id="chatMessages"><div class="empty">Select a friend to start chatting.</div></div>
+<div class="chat-send">
+<input id="messageInput" placeholder="Write a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+<button class="primary" onclick="sendMessage()">Send</button>
+</div>
+</div>
+</div>
+<p class="muted">Demo messaging: messages are stored only in this browser.</p>
+</section>
+
+<section class="page" id="communities">
+<h3>Discover Communities</h3>
+<input id="communitySearch" placeholder="Search communities..." oninput="renderCommunities()">
+<div class="card" id="communityList"></div>
+</section>
+
+<section class="page" id="profile">
+<div class="profile-head">
+<div class="avatar big-avatar" id="profileAvatar">G</div>
+<div><h2 id="profileHeading">Gamer</h2><p class="muted">GamerHub member</p></div>
+</div>
+<div class="card">
+<h3>Edit Your Profile</h3>
+<label>Username</label><input id="username" value="Gamer">
+<label>About Me</label><textarea id="bio" placeholder="Tell everyone about yourself..." style="width:100%;background:#191932;color:white;padding:12px;border-radius:10px;border:1px solid #353052;min-height:90px"></textarea>
+<button class="primary" onclick="saveProfile()">Save Profile</button>
+</div>
+<div class="card"><h3>My Gaming Interests</h3><p>🎮 Gaming &nbsp; 🏆 Competition &nbsp; 🤝 Community</p></div>
+</section>
+<footer>GamerHub © 2026 · Made for gamers, by gamers.</footer>
+</main>
+</div>
+
+<nav class="mobile-nav">
+<button onclick="showPage('home')">⌂<br>Home</button>
+<button onclick="showPage('friends')">♧<br>Friends</button>
+<button onclick="showPage('messages')">✉<br>Messages</button>
+<button onclick="showPage('communities')">◈<br>Groups</button>
+<button onclick="showPage('profile')">◎<br>Profile</button>
+</nav>
+
+<script>
+const friends=[
+{name:"ShadowPlayer",status:"Online",initial:"S"},
+{name:"PixelWarrior",status:"Online",initial:"P"},
+{name:"NovaGamer",status:"Away",initial:"N"},
+{name:"DragonSlayer",status:"Offline",initial:"D"}
+];
+const communities=[
+{name:"Call of Duty Central",game:"Call of Duty",members:"12.4K"},
+{name:"Minecraft Builders",game:"Minecraft",members:"8.2K"},
+{name:"Fortnite Squad",game:"Fortnite",members:"15.1K"},
+{name:"Resident Evil Fans",game:"Resident Evil",members:"4.7K"},
+{name:"GTA Online Crew",game:"GTA",members:"9.8K"}
+];
+let joined=new Set(["Call of Duty Central","Minecraft Builders"]);
+let selectedFriend="";
+let chats={};
+
+function showPage(name){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(name).classList.add("active");
+document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+document.getElementById("pageTitle").textContent={home:"Home",friends:"Friends",messages:"Messages",communities:"Communities",profile:"My Profile"}[name];
+}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+
+function addPost(){
+const input=document.getElementById("postText");
+const value=input.value.trim();
+if(!value)return alert("Write something first!");
+const card=document.createElement("div");card.className="card";
+const name=document.createElement("b");name.textContent="◎ "+document.getElementById("username").value;
+const p=document.createElement("p");p.textContent=value;
+const actions=document.createElement("div");actions.className="post-actions";
+const like=document.createElement("button");like.textContent="♡ Like";
+like.onclick=()=>{let n=Number(like.dataset.likes||0)+1;like.dataset.likes=n;like.textContent="♥ "+n+" Likes";};
+actions.appendChild(like);card.append(name,p,actions);
+document.getElementById("feed").prepend(card);
+input.value="";
+document.getElementById("postCount").textContent=Number(document.getElementById("postCount").textContent)+1;
+}
+function renderFriends(list=friends){
+const box=document.getElementById("friendList");box.innerHTML="";
+list.forEach(f=>{
+const item=document.createElement("div");item.className="person";
+item.innerHTML='<div class="avatar">'+f.initial+'</div><div style="flex:1"><b>'+f.name+'</b><div class="online">'+f.status+'</div></div>';
+const button=document.createElement("button");button.className="primary";button.textContent="Message";button.onclick=()=>{showPage("messages");selectFriend(f.name)};
+item.appendChild(button);box.appendChild(item);
+});
+}
+function searchFriends(){
+const q=document.getElementById("friendSearch").value.toLowerCase();
+renderFriends(friends.filter(f=>f.name.toLowerCase().includes(q)));
+}
+function renderChatPeople(){
+const box=document.getElementById("chatPeople");box.innerHTML="";
+friends.forEach(f=>{
+const b=document.createElement("button");b.className="person";b.style.cssText="background:none;border:0;color:white;width:100%;text-align:left";
+b.innerHTML='<div class="avatar">'+f.initial+'</div><b>'+f.name+'</b>';
+b.onclick=()=>selectFriend(f.name);box.appendChild(b);
+});
+}
+function selectFriend(name){
+selectedFriend=name;document.getElementById("chatName").textContent=name;renderMessages();
+}
+function renderMessages(){
+const box=document.getElementById("chatMessages");box.innerHTML="";
+(chats[selectedFriend]||[]).forEach(m=>{
+const b=document.createElement("div");b.className="bubble"+(m.mine?" mine":"");b.textContent=m.text;box.appendChild(b);
+});
+box.scrollTop=box.scrollHeight;
+}
+function sendMessage(){
+const input=document.getElementById("messageInput"),value=input.value.trim();
+if(!selectedFriend)return alert("Choose a friend first!");
+if(!value)return;
+(chats[selectedFriend]??=[]).push({text:value,mine:true});
+input.value="";renderMessages();
+}
+function renderCommunities(){
+const q=document.getElementById("communitySearch").value.toLowerCase();
+const box=document.getElementById("communityList");box.innerHTML="";
+communities.filter(c=>(c.name+c.game).toLowerCase().includes(q)).forEach(c=>{
+const item=document.createElement("div");item.className="community";
+const info=document.createElement("div");info.style.flex="1";
+const title=document.createElement("b");title.textContent="◈ "+c.name;
+const desc=document.createElement("p");desc.className="muted";desc.textContent=c.game+" · "+c.members+" members";
+info.append(title,desc);
+const button=document.createElement("button");button.className="primary";
+button.textContent=joined.has(c.name)?"Joined ✓":"Join";
+button.onclick=()=>{joined.has(c.name)?joined.delete(c.name):joined.add(c.name);renderCommunities();document.getElementById("communityCount").textContent=joined.size};
+item.append(info,button);box.appendChild(item);
+});
+}
+function saveProfile(){
+const name=document.getElementById("username").value.trim()||"Gamer";
+document.getElementById("username").value=name;
+document.getElementById("profileHeading").textContent=name;
+document.getElementById("profileAvatar").textContent=name[0].toUpperCase();
+alert("Profile updated!");
+}
+renderFriends();renderChatPeople();renderCommunities();
+</script>
+</body>
+</html>
+
