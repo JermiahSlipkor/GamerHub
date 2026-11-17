@@ -261,5 +261,14 @@ alert("Profile updated!");
 renderFriends();renderChatPeople();renderCommunities();
 </script>
 </body>
+<!-- GamerHub Supabase Connection -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const gamerHubDB = window.supabase.createClient(
+  "https://fiwqznxvtqwkgevnuqkd.supabase.co",
+  "sb_publishable_fcRYaISRHJKh2sS0cI13IA_MBuApNbn"
+);
+</script>
+
 </html>
 
