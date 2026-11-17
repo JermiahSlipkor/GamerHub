@@ -271,4 +271,151 @@ const gamerHubDB = window.supabase.createClient(
 </script>
 
 </body>
+<style>
+#gh-auth {
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:#090914;padding:20px;color:white;
+  font-family:Arial,sans-serif;
+}
+#gh-auth .auth-card {
+  width:100%;max-width:420px;background:#15152b;
+  border:1px solid #39305e;border-radius:20px;
+  padding:28px;box-shadow:0 0 35px #703cff33;
+}
+#gh-auth h1 {
+  text-align:center;
+  background:linear-gradient(90deg,#a45cff,#21d4fd);
+  color:transparent;background-clip:text;
+}
+#gh-auth input {
+  width:100%;padding:13px;margin:8px 0;
+  border-radius:9px;border:1px solid #39305e;
+  background:#22223b;color:white;box-sizing:border-box;
+}
+#gh-auth button {
+  width:100%;padding:13px;margin-top:12px;
+  border:0;border-radius:9px;color:white;
+  background:linear-gradient(90deg,#914cff,#287bff);
+  font-weight:bold;cursor:pointer;
+}
+#gh-auth .switch {
+  background:transparent;border:1px solid #514078;
+}
+#gh-auth p{text-align:center;color:#aaa}
+#gh-auth .error{color:#ff8585}
+</style>
+
+<div id="gh-auth">
+  <div class="auth-card">
+    <h1>✦ GamerHub</h1>
+    <p id="auth-heading">Create your gamer account</p>
+
+    <input id="gh-name" placeholder="Display name">
+    <input id="gh-email" type="email" placeholder="Email address">
+    <input id="gh-password" type="password"
+      placeholder="Password (at least 8 characters)">
+
+    <button id="gh-submit" onclick="ghSubmit()">Create Account</button>
+    <button class="switch" id="gh-switch"
+      onclick="ghToggle()">Already have an account? Log in</button>
+
+    <p id="gh-message"></p>
+  </div>
+</div>
+
+<script>
+let ghLoginMode = false;
+
+function ghToggle(){
+  ghLoginMode = !ghLoginMode;
+  document.getElementById("auth-heading").textContent =
+    ghLoginMode ? "Welcome back, gamer!" : "Create your gamer account";
+  document.getElementById("gh-name").style.display =
+    ghLoginMode ? "none" : "block";
+  document.getElementById("gh-submit").textContent =
+    ghLoginMode ? "Log In" : "Create Account";
+  document.getElementById("gh-switch").textContent =
+    ghLoginMode ? "Need an account? Sign up" : "Already have an account? Log in";
+  document.getElementById("gh-message").textContent = "";
+}
+
+async function ghSubmit(){
+  const email = document.getElementById("gh-email").value.trim();
+  const password = document.getElementById("gh-password").value;
+  const name = document.getElementById("gh-name").value.trim();
+  const message = document.getElementById("gh-message");
+  const button = document.getElementById("gh-submit");
+
+  message.textContent = "";
+
+  if(!email || !password || (!ghLoginMode && !name)){
+    message.textContent = "Please fill in all required fields.";
+    return;
+  }
+
+  if(password.length < 8){
+    message.textContent = "Your password must be at least 8 characters.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Please wait...";
+
+  try {
+    let result;
+
+    if(ghLoginMode){
+      result = await gamerHubDB.auth.signInWithPassword({
+        email,password
+      });
+    } else {
+      result = await gamerHubDB.auth.signUp({
+        email,password,
+        options:{
+          data:{display_name:name}
+        }
+      });
+    }
+
+    if(result.error) throw result.error;
+
+    if(!ghLoginMode && !result.data.session){
+      message.textContent =
+        "Account created! Check your email to confirm your account.";
+    } else {
+      message.textContent = "Success!";
+    }
+  } catch(error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = ghLoginMode ? "Log In" : "Create Account";
+  }
+}
+
+async function ghCheckSession(){
+  const {data,error} = await gamerHubDB.auth.getSession();
+
+  if(error){
+    document.getElementById("gh-message").textContent = error.message;
+    return;
+  }
+
+  if(data.session){
+    document.getElementById("gh-auth").style.display = "none";
+  }
+}
+
+gamerHubDB.auth.onAuthStateChange((event,session)=>{
+  if(session){
+    document.getElementById("gh-auth").style.display = "none";
+  } else {
+    document.getElementById("gh-auth").style.display = "flex";
+  }
+});
+
+ghCheckSession();
+</script>
+</body>
 </html>
